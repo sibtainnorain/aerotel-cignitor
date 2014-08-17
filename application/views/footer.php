@@ -1,0 +1,1 @@
+<div class="footer" style="  height: 25px; padding-top: 0; z-index:200;  ">			<div class="footer-content" style="  ">				<img src="<?php echo asset_url();?>img/footer_left_logo_text.png" class="footer-left-logo-text">				<span class="footer-text">					© 2002 - 2014 Aerotel Group. All rights reserved.				</span> 			</div>		</div>

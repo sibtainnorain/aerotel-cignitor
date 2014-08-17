@@ -1,0 +1,24 @@
+
+.table.table-bordered thead tr th {
+vertical-align: middle;
+
+}
+.mt{
+	margin-top: 120px;
+}
+.m0{
+	margin: 0;
+}
+.brdr{
+	border: 1px solid #aaa;
+	border-radius: 5px;
+}
+.pad{
+	padding: 15px;
+}
+button.password-submit{
+	margin-left: 144px;
+}
+.space2{
+	margin: 12px 0;
+}

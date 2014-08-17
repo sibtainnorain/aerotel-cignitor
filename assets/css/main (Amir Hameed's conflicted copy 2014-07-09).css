@@ -1,0 +1,100 @@
+
+.table.table-bordered thead tr th {
+vertical-align: middle;
+
+}
+.mt{
+	margin-top: 120px;
+}
+.m0{
+	margin: 0;
+}
+.brdr{
+	border: 1px solid #aaa;
+	border-radius: 5px;
+}
+.pad{
+	padding: 15px;
+}
+button.password-submit{
+	margin-left: 144px;
+}
+.space2{
+	margin: 12px 0;
+}
+.d-downs{
+	background-color: #eee;
+	padding: 10px 0;
+	
+}
+.d-downs .ace-nav>li{
+height: auto;
+}
+.d-downs .ace-nav>li>a{
+	height: auto;
+	line-height: normal;
+}
+.d-downs ul.ace-nav{
+	margin-left: 10px !important;
+}
+body.login{
+	background: url('../img/ipad.jpg');
+}
+.login-box{
+	position: relative;
+}
+.log-form {
+position: absolute;
+top: 155px;
+left: 115px;
+}
+@media only screen and (max-width: 460px){
+.ace-nav {
+
+background-color: transparent;
+  }
+}
+.form-group select{
+	margin-bottom: 20px;
+}
+th{
+	background-color: #307ecc !important;
+	color: #fff;
+	font-weight: normal !important;
+}
+.widget-header{
+	background-color: #307ecc;
+	color: #fff;
+}
+.page-header{
+	padding-bottom: 0;
+	padding-top: 0;
+	border-bottom: none;
+}
+.hr32 {
+margin: 15px 0;
+overflow: auto;
+}
+.footer-content{
+	font-size: 11px;
+padding: 1px 8px;
+background-color: #99CC00;
+}
+.footer{
+	position: fixed;
+bottom: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: 200;
+}
+.logo-main {
+padding: 0px;
+margin: 0px;
+width: 650px;
+border: none;
+/* background-image: url(../img/logo-main-salespro.png?280); */
+background-repeat: no-repeat;
+border-collapse: collapse;
+/* background-size: 100% 100%; */
+}
