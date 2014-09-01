@@ -44,6 +44,7 @@ $route['404_override'] = '';
 $route['signin'] = 'login/index';
 $route['home'] = 'login/home';
 $route['assets/(:any)'] = 'assets/$1';
+$route['so/so_details'] = 'so/get_so_details';
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

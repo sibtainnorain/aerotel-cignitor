@@ -25,19 +25,8 @@ class Login extends CI_Controller {
     }
 
     public function authenticate()
-    {
-        $this->form_validation->set_rules('username', 'Username', 'required');
-        $this->form_validation->set_rules('password', 'Password', 'required');
-
-        if ($this->form_validation->run() == FALSE) {
-            echo json_encode(array(
-                'status' => 'FAILURE',
-                'message' => validation_errors()
-            ));
-            return;
-        }
-        
-        $result = $this->User_model->authenticate($_POST['username'], $_POST['password']);
+    {   
+        $result = $this->User_model->authenticate($_GET['username'], $_GET['password'], $_GET['platform']);
         $result['redirect_url'] = 'home';
         echo json_encode($result);
     }

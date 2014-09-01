@@ -54,8 +54,8 @@ session_write_close();
 
                     username = $("#txtUsername").val();
                     password = $("#txtPassword").val();
-                    $.post("login/authenticate",
-                        {username: username, password: password},
+                    $.get("login/authenticate",
+                        {username: username, password: password, platform: 'web'},
                         function(result) {
                             var json = $.parseJSON(result);
                             if (json.status == 'SUCCESS')

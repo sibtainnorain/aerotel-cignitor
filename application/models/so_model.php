@@ -8,38 +8,319 @@ class SO_model extends CI_Model {
         $this->load->database();
     }
     
-    public function get_all_sos($username, $user_id, $department_id, $so_status)
+    public function get_all_sos($user_id, $department_id)
     {
-        if ($department_id == 2)
-        {
-            //$query = $this->db->get_where('tbl_so', array('so_status' => $so_status));
-            $query = $this->db->get('tbl_so');
-        }
-        else
-        {
-            $query = $this->db->get_where('tbl_so', array('so_user_id' => $user_id));
-            //$query = $this->db->get('tbl_so');
-        }
+        $so_data_row = array();
+        $so_data_arr = array();
         
-        if ($query->num_rows() > 0)
+        try {
+            if ($department_id == 2)
+            {
+                $query = $this->db->get('tbl_so');
+            }
+            else
+            {
+                if ($this->session->userdata('is_supervisor') == 'true')
+                {
+                    $query = $this->db->get_where('tbl_so', array('department_id' => $this->session->userdata('department_id')));
+                }
+                else
+                {
+                    $query = $this->db->get_where('tbl_so', array('user_id' => $user_id));
+                }
+            }
+
+            if ($query->num_rows() > 0)
+            {
+                $so_data = $query->result_array();
+
+                return array(
+                    'status' => 'SUCCESS',
+                    'message' => 'Records Found.',
+                    'count' => $query->num_rows(),
+                    'records' => $so_data
+                );
+            }
+            else
+            {
+                return array(
+                    'status' => 'SUCCESS',
+                    'message' => 'No Records Found.',
+                    'count' => 0,
+                    'records' => null
+                );
+            }
+        } catch (Exception $exc) {
+            return array(
+                    'status' => 'FAILURE',
+                    'message' => 'An error occured while fetching the data from server.',
+                    'count' => 0,
+                    'records' => null
+                );
+        }
+    }
+    
+    public function get_so_by_id($so_id)
+    {
+        $this->db->from('tbl_so');   
+        $this->db->where('id', $so_id);
+        $so_data = $this->db->get()->row_array();
+        
+        $current_stage_number = $so_data['current_stage_number'];
+        $current_stage_data = $this->get_stage_by_number($current_stage_number);
+        $next_stage_data = $this->get_stage_by_number($current_stage_number + 1);
+        $customer_data = $this->get_customer_by_id($so_data['customer_id']);
+        
+        if (sizeof($so_data) > 0)
         {
             return array(
                 'status' => 'SUCCESS',
-                'message' => 'Records Found.',
-                'count' => $query->num_rows(),
-                'records' => $query->result_array()
+                'message' => 'One record found',
+                'so_data' => $so_data,
+                'current_stage_data' => $current_stage_data,
+                'next_stage_data' => $next_stage_data,
+                'customer_data' => $customer_data
             );
         }
         else
         {
             return array(
                 'status' => 'SUCCESS',
-                'message' => 'No Records Found.',
-                'count' => 0,
-                'records' => null
+                'message' => 'No record found',
+                'so_data' => null,
+                'current_stage_data' => null,
+                'next_stage_data' => null,
+                'customer_data' => null
             );
         }
         
+    }
+
+
+    public function create_so($txtSoHeader, $country, $customer, $isp, $order_type, $service_type, $technology_type,
+                              $admin_address, $admin_cell, $admin_designation, $admin_direct_line, $admin_email,
+                              $admin_name, $billing_address, $billing_cell, $billing_designation, $billing_direct_line,
+                              $billing_email, $billing_name, $tech_address, $tech_cell, $tech_designation, $tech_direct_line,
+                              $tech_email, $tech_name, $finance_description, $finance_end_point_address, $finance_install_charge,
+                              $finance_monthly_charge, $finance_start_point, $finance_subtotal, $finance_term, $finance_total,
+                              $finance_units, $finance_vat, $gps_coordinates, $vat_number, $special_terms, $registration_number,
+                              $installation_address, $bandwidth, $username, $user_id, $department_id)
+    {
+        $so_insert = array('so_header' => $txtSoHeader, 'customer_id' => $customer, 'user_id' => $user_id, 
+                           'department_id' => $department_id, 'status_id' => 1, 
+                           'current_stage_number' => 1, 'order_type' => $this->get_order_type_by_id($order_type), 
+                           'service_type' => $this->get_service_type_by_id($service_type), 
+                           'country' => $this->get_country_by_id($country), 
+                           'customer_name' => $this->get_customer_name($customer), 
+                           'technology_type' => $this->get_technology_type_by_id($technology_type));
+
+        $this->db->insert('tbl_so', $so_insert);
+        $so_id = $this->db->insert_id();
         
+        $stage_data_json = json_encode(array('country' => $country, 'isp' => $isp, 'order_type' => $order_type, 'service_type' => $service_type,
+                                            'technology_type' => $technology_type, 'admin_address' => $admin_address, 'admin_cell' => $admin_cell, 
+                                            'admin_designation' => $admin_designation, 'admin_direct_line' => $admin_direct_line, 
+                                            'admin_email' => $admin_email, 'admin_name' => $admin_name, 'billing_address' => $billing_address, 
+                                            'billing_cell' => $billing_cell, 'billing_designation' => $billing_designation, 
+                                            'billing_direct_line' => $billing_direct_line, 'billing_email' => $billing_email, 
+                                            'billing_name' => $billing_name, 'tech_address' => $tech_address, 'tech_cell' => $tech_cell, 
+                                            'tech_designation' => $tech_designation, 'tech_direct_line' => $tech_direct_line, 'tech_email' => $tech_email, 
+                                            'tech_name' => $tech_name, 'finance_description' => $finance_description, 
+                                            'finance_end_point_address' => $finance_end_point_address, 'finance_install_charge' => $finance_install_charge, 
+                                            'finance_monthly_charge' => $finance_monthly_charge, 'finance_start_point' => $finance_start_point, 
+                                            'finance_subtotal' => $finance_subtotal, 'finance_term' => $finance_term, 'finance_total' => $finance_total, 
+                                            'finance_units' => $finance_units, 'finance_vat' => $finance_vat, 'gps_coordinates' => $gps_coordinates, 
+                                            'vat_number' => $vat_number, 'special_terms' => $special_terms, 'registration_number' => $registration_number, 
+                                            'installation_address' => $installation_address, 'bandwidth' => $bandwidth, 'gps_coordinates' => $gps_coordinates
+                    ));
+        
+        $stage_insert = array('so_id' => $so_id, 'user_id' => $user_id,
+                              'department_id' => $department_id, 'stage_number' => 1, 
+                              'application_type' => 'web', 'stage_data' => $stage_data_json);
+        
+        $this->db->insert('tbl_stage_data', $stage_insert);
+        
+        return array(
+                'status' => 'SUCCESS',
+                'message' => 'SO created successfully.'
+            );
+    }
+    
+    public function get_stage_data($so_id, $stage_id)
+    {
+        $this->db->from('tbl_stage_data');   
+        $this->db->where('so_id', $so_id);
+        $this->db->where('stage_id', $stage_id);
+        $this->db->order_by('created_date', 'ASC');
+        $this->db->limit(1);
+        
+        $row_data = $this->db->get()->row_array();
+        $data = json_decode($row_data['stage_data'], true);
+        $data['order_type'] = $this->get_order_type_by_id($data['order_type']);
+        $data['service_type'] = $this->get_service_type_by_id($data['service_type']);
+        $data['technology_type'] = $this->get_technology_type_by_id($data['technology_type']);
+        $data['isp'] = $this->get_isp_by_id($data['isp']);
+        $data['country'] = $this->get_country_by_id($data['country']);
+        
+        $row_data['stage_data'] = json_encode($data);
+        return $row_data;
+    }
+    
+    public function get_order_type_by_id($order_type_id)
+    {
+        $this->db->from('tbl_order_type');   
+        $this->db->where('ot_id', $order_type_id);
+        return $this->db->get()->row()->ot_name;
+        
+    }
+    
+    public function get_service_type_by_id($service_type_id)
+    {
+        $this->db->from('tbl_service_type');   
+        $this->db->where('st_id', $service_type_id);
+        return $this->db->get()->row()->st_name;
+        
+    }
+    
+    public function get_technology_type_by_id($technology_type_id)
+    {
+        $this->db->from('tbl_technology_type');   
+        $this->db->where('tt_id', $technology_type_id);
+        return $this->db->get()->row()->tt_name;
+        
+    }
+    
+    public function get_isp_by_id($isp_id)
+    {
+        $this->db->from('tbl_isp_details');   
+        $this->db->where('isp_id', $isp_id);
+        return $this->db->get()->row()->isp_name;
+    }
+    
+    public function get_country_by_id($country_id)
+    {
+        $this->db->from('tbl_country');   
+        $this->db->where('country_id', $country_id);
+        return $this->db->get()->row()->country_name;
+    }
+    
+    public function get_customer_name($customer_id)
+    {
+        $this->db->from('tbl_customer');   
+        $this->db->where('customer_id', $customer_id);
+        return $this->db->get()->row()->customer_name;
+    }
+    
+    public function get_department_by_stage_number($stage_number)
+    {
+        $this->db->from('tbl_stage');   
+        $this->db->where('stage_number', $stage_number);
+        return $this->db->get()->row()->department_id;
+    }
+    
+    public function next_stage($current_stage, $next_stage, $notes, $so_id, $department_id, $user_id, $checked_by=null, $date_passed=null, $date_of_boq_submission=null, $stage=null)
+    {
+        $data = array(
+                    'current_stage_number' => $next_stage,
+                    'department_id' => $this->get_department_by_stage_number($next_stage),
+                    'user_id' => null
+                );
+
+        $this->db->where('id', $so_id);
+        $this->db->update('tbl_so', $data);
+        
+        if ($current_stage == 1)
+        {
+            $stage_data_json = json_encode(array('notes' => $notes));
+        }
+        else if ($current_stage == 2)
+        {
+            $stage_data_json = json_encode(array('notes' => $notes, 'checked_by' => $checked_by, 'date_passed' => $date_passed));
+        }
+        else if ($current_stage == 3)
+        {
+            $stage_data_json = json_encode(array('notes' => $notes, 'checked_by' => $checked_by, 'date_passed' => $date_passed));
+        }
+        else if ($current_stage == 4)
+        {
+            $stage_data_json = json_encode(array('notes' => $notes, 'checked_by' => $checked_by, 'date_passed' => $date_passed));
+        }
+        else if ($current_stage == 6)
+        {
+            $stage_data_json = json_encode(array('notes' => $notes, 'date_of_boq_submission' => $date_of_boq_submission, 'stage' => $stage));
+        }
+        
+        
+        $stage_insert = array('so_id' => $so_id, 'user_id' => $user_id,
+                              'department_id' => $department_id, 'stage_number' => $current_stage, 
+                              'application_type' => 'web', 'stage_data' => $stage_data_json);
+        
+        $this->db->insert('tbl_stage_data', $stage_insert);
+        
+        return array(
+                'status' => 'SUCCESS',
+                'message' => 'SO has been sent to next stage.'
+            );
+    }
+    
+    public function get_so_statuses()
+    {
+        //$this->db->from('tbl_so_status');
+        $resultset = $this->db->get('tbl_so_status')->result();
+        
+        if (sizeof($resultset) > 0)
+        {
+            return array(
+                'status' => 'SUCCESS',
+                'message' => 'SO Statuses',
+                'records' => $resultset,
+                'count' => count($resultset)
+            );
+        }
+        else
+        {
+            return array(
+                'status' => 'SUCCESS',
+                'message' => 'No records found',
+                'records' => null,
+                'count' => 0
+            );
+        }
+    }
+    
+    public function update_so_status($so_id, $status_id)
+    {
+        $data = array(
+                    'status_id' => $status_id
+                );
+
+        $this->db->where('id', $so_id);
+        $this->db->update('tbl_so', $data);
+        
+        return array(
+                'status' => 'SUCCESS',
+                'message' => 'SO Status has been updated successfully.'
+            );
+    }
+    
+    public function get_stage_by_number($stage_number)
+    {
+        $this->db->from('tbl_stage');   
+        $this->db->where('stage_number', $stage_number);
+        return $this->db->get()->row_array();
+    }
+    
+    public function get_customer_by_id($customer_id)
+    {
+        $this->db->from('tbl_customer');   
+        $this->db->where('customer_id', $customer_id);
+        return $this->db->get()->row_array();
+    }
+    
+    public function get_stage_id($stage_number)
+    {
+        $this->db->from('tbl_stage');   
+        $this->db->where('stage_number', $stage_number);
+        return $this->db->get()->row()->customer_name;
     }
 }

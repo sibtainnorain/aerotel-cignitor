@@ -21,9 +21,12 @@
         <link href="<?php echo asset_url();?>css/ace-rtl.min.css" rel="stylesheet">
         <link href="<?php echo asset_url();?>css/ace-skins.min.css" rel="stylesheet">
         <link href="<?php echo asset_url();?>css/main.css" rel="stylesheet">
-        <!--[if lte IE 8]>          <link rel="stylesheet" href="css/ace-ie.min.css" />          <![endif]--><!-- inline styles related to this page --><!-- ace settings handler -->
+        <!--[if lte IE 8]>          
+            <link rel="stylesheet" href="css/ace-ie.min.css" />          
+        <![endif]-->
+        <!-- inline styles related to this page --><!-- ace settings handler -->
         <script src="<?php echo asset_url();?>js/ace-extra.min.js"></script>
-        <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+        <script src="<?php echo asset_url();?>/js/jquery-1.10.2.min.js"></script>
         <script>
             $(document).ready(function(){
                $(".logout-user").find("a").on("click", function(){
@@ -39,7 +42,6 @@
             <style type="text/css">
                 .logo-main          {               /*background-image: url(http://salespro.aerotelgroup.com/assets/img/logo-main-salespro.png);*/              background-image: url(http://salespro.aerotelgroup.com/assets/img/logo-main-inbox.png);         }           
             </style><!-- end css -->
-
             <table border="0" cellpadding="0" cellspacing="0" class="wide" style=
                    "height:52px; border: none; margin: 0px; padding: 0px;" width="100%">
                 <tbody>
@@ -169,11 +171,7 @@
                         </td>
                     </tr>
                 </tbody>
-            </table><script>
-                $(document).ready(function(){                                                               
-                    //get current url       //select an <a> element that has the matching href and apply a class of active.     var url = window.location;              $("li[id = '" +url+ "']").addClass('my_active_menu_link');          
-                    });                                                                                                     
-            </script>
+            </table>
 
             <div class="navbar navbar-inverse navbar-inner container-nav" style=
                  "background-color: black; height: 40px">
@@ -207,8 +205,7 @@
                 <div class="row" id="submenu_bar" style=
                      " margin-left: 10px; /*margin-bottom:200px */"></div>
 
-                <div class="span3 pull-right" id="alerts_container" style=
-                     "color: gray; font-size: 20px; font-weight: normal; height: 48px; padding: 10px; padding-right: 1px; position: absolute; right: 0; text-align: center">
+                <div class="span3 pull-right" id="alerts_container" style="color: gray; font-size: 13px; font-weight: normal; height: 48px; padding: 10px; padding-right: 1px; position: absolute; right: 0; text-align: center">
                     <?php print $this->session->userdata('first_name').' '.$this->session->userdata('last_name'); ?>
                 </div>
             </div>
