@@ -3,7 +3,7 @@
 
 <!-- Advance Stage Modal -->
 <div class="modal fade" id="next_stage_modal" tabindex="-1" role="dialog" aria-labelledby="next_stage_modalLabel" aria-hidden="true">
-    <div class="modal-dialog b-radius" style="width:500px;">
+    <div class="modal-dialog b-radius" style="width:610px;">
         <div class="modal-content b-radius" style="background-color:#eee">
             <div class="modal-header-1">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -14,21 +14,30 @@
                 <form role="form" class="form-horizontal" id="next_stage_form">
                     <div class="row mt20">
                         <div class="col-sm-6"> 
-                            <input type = "text" title="Checked By" readonly="readonly" class = "form-control" id = "txtCheckedBy" name = "txtCheckedBy" value="<?php print $this->session->userdata('first_name').' '.$this->session->userdata('last_name'); ?>" />
+                            <input type = "text" title="Allocated By" readonly="readonly" class = "form-control" id = "txtAllocatedBy" name = "txtAllocatedBy" value="<?php print $this->session->userdata('first_name').' '.$this->session->userdata('last_name'); ?>" />
                         </div>
                         <div class="col-sm-6">
-                            <input type = "text" title="Date Passed" readonly="readonly" class = "form-control" id = "txtDatePassed" name = "txtDatePassed" value="<?php $now = new DateTime(); echo $now->format('m-d-Y'); ?>" />
+                            <input type = "text" title="Date of Allocation to Planning Field Engineer" readonly="readonly" class = "form-control" id = "txtDateAllocated" name = "txtDateAllocated" value="<?php $now = new DateTime(); echo $now->format('m-d-Y'); ?>" />
                         </div>
                     </div>
                     <div class="row mt20">
-                        <textarea rows="8" class="col-xs-10 col-sm-12" placeholder="Notes" id="next_stage_notes" name="next_stage_notes" style="resize: none;"></textarea>
+                        <div class="col-sm-6"> 
+                            <select class="form-control b-radius" id="planning_engineer_name_dd" name="planning_engineer_name_dd">
+                                <option value="">- Planning Field Engineer Name -</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt20">
+                        <div>
+                            <textarea rows="8" class="col-xs-10 col-sm-12" placeholder="Notes" id="next_stage_notes" name="next_stage_notes" style="resize: none;"></textarea>
+                        </div>
                     </div>
                     <div class="row mt20">
                         <button id="advanceStageBtn" class="b-radius btn-large btn-primary1 modal-font" style="min-width: 84%;margin-left:35px;line-height:30px;">Advance to next stage</button>
                     </div>
-                    <input type="hidden" name="current_stage" value="2" />
-                    <input type="hidden" name="next_stage" value="4" />
-                    <input type="hidden" id="stage_2-3_so_id" name="so_id" value="" />
+                    <input type="hidden" name="current_stage" value="4" />
+                    <input type="hidden" name="next_stage" value="5" />
+                    <input type="hidden" id="stage_4-5_so_id" name="so_id" value="" />
                     <input type="hidden" name="user_id" value="<?php echo $this->session->userdata('user_id'); ?>" />
                     <input type="hidden" name="department_id" value="<?php echo $this->session->userdata('department_id'); ?>" />
                 </form>
@@ -38,26 +47,28 @@
 </div>
 <script type="text/javascript">
 $(document).ready(function() {
-//    $('#next_stage_form').bootstrapValidator({
-//        excluded: [':disabled', ':hidden', ':not(:visible)'],
-//        feedbackIcons: {
-//            valid: 'glyphicon glyphicon-ok',
-//            invalid: 'glyphicon glyphicon-remove',
-//            validating: 'glyphicon glyphicon-refresh'
-//        },
-//        live: 'enabled',
-//        message: 'This value is not valid',
-//        trigger: null,
-//        fields: {
-//            next_stage_notes: {
-//                validators: {
-//                    notEmpty: {
-//                        message: 'Notes are required'
-//                    }
-//                }
-//            }
-//        }
-//    });
+    $.get("user/get_all_planning_field_engineers",
+    function(result) 
+    {
+        var obj = $.parseJSON(result);
+        var current_user = <?php echo $this->session->userdata('user_id'); ?>
+        //var is_supervisor = <?php echo filter_var($this->session->userdata('user_id'), FILTER_VALIDATE_BOOLEAN); ?>
+        
+        if (obj.status == 'SUCCESS')
+        {
+            var records = obj.records;
+
+            for (var i = 0; i < records.length; i++)
+            {
+                if (records[i].user_id != current_user && records[i].is_supervisor == 'false')
+                {
+                    $('<option value="' + records[i].user_id + '">' + records[i].first_name + ' ' + records[i].last_name + '</option>').css('text-indent', '0px').appendTo($("#planning_engineer_name_dd"));
+            
+                }
+            }
+        }
+        
+    });
     
     $('#next_stage_modal').on('shown.bs.modal', function() {
         $('#next_stage_form').bootstrapValidator('resetForm', true);
@@ -65,7 +76,7 @@ $(document).ready(function() {
     
     $('#advanceStageBtn').on('click', function(event) {
         var $form = $('#next_stage_form');
-        $('#stage_2-3_so_id').val(selected_so);
+        $('#stage_4-5_so_id').val(selected_so);
         
         $.ajax({
             type: 'get',

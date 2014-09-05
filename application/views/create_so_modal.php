@@ -190,12 +190,12 @@
                             </select>
                         </div>
                         <div class = "col-sm-6">
-                            <input type = "text" placeholder = "Start Point" class = "form-control" id = "txtFinanceStartPoint" name = "txtFinanceStartPoint" />
+                            <input type = "text" placeholder = "Start Point" class = "form-control" id = "txtStartPoint" name = "txtStartPoint" />
                         </div>
                     </div>
                     <div class = "row mt20">
                         <div class = "col-sm-6">
-                            <input type = "text" placeholder = "End Point Address" class = "form-control" id = "txtFinanceEndPointAddress" name = "txtFinanceEndPointAddress" />
+                            <input type = "text" placeholder = "End Point Address" class = "form-control" id = "txtEndPointAddress" name = "txtEndPointAddress" />
                         </div>
                     </div>
                     <br />

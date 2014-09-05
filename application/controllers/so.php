@@ -16,14 +16,22 @@ class SO extends CI_Controller {
     {
         $user_id = $_GET['user_id'];
         $department_id = $_GET['department_id'];
+        $stage_number = null;
+        
+        if (!empty($_GET['stage_number']))
+        {
+            $stage_number = $_GET['stage_number'];
+        }
 
-        echo json_encode($this->So_model->get_all_sos($user_id, $department_id));
+        echo json_encode($this->So_model->get_all_sos($user_id, $department_id, $stage_number));
     }
     
-    public function get_so_details()
+    public function get_so_details($so_id)
     {
+        $data['so_data'] = $this->So_model->get_so_by_id($so_id);
+        $data['so_history'] = $this->So_model->get_so_history($so_id);
         $this->load->view('header');
-        $this->load->view('so_details');
+        $this->load->view('so_details', $data);
         $this->load->view('footer');
     }
     
@@ -43,13 +51,13 @@ class SO extends CI_Controller {
         else
         {
             $txtSoHeader = $_GET['txtSoHeader'];
-            $country = (int) $_GET['country_dd'];
+            $country = $_GET['country_dd'];
             $customer = (int) $_GET['customer_dd'];
             $isp = $_GET['isp_dd'];
             $order_type = $_GET['order_type_dd'];
             $service_type = $_GET['service_type_dd'];
             $technology_type = $_GET['technology_type_dd'];
-            //$status = $_GET['status'];
+            $suburb = $_GET['suburb_dd'];
 
             $admin_address = $_GET['txtAdminAddress'];
             $admin_cell = $_GET['txtAdminCell'];
@@ -73,10 +81,10 @@ class SO extends CI_Controller {
             $tech_email = $_GET['txtTechEmail'];
             
             $finance_description = $_GET['txtFinanceDescription'];
-            $finance_end_point_address = $_GET['txtFinanceEndPointAddress'];
+            $end_point_address = $_GET['txtEndPointAddress'];
             $finance_install_charge = $_GET['txtFinanceInstallCharge'];
             $finance_monthly_charge = $_GET['txtFinanceMonthlyCharge'];
-            $finance_start_point = $_GET['txtFinanceStartPoint'];
+            $start_point = $_GET['txtStartPoint'];
             $finance_term = $_GET['txtFinanceTerm'];
             $finance_subtotal = $_GET['txtFinanceSubTotal'];
             $finance_total = $_GET['txtFinanceTotal'];
@@ -94,10 +102,10 @@ class SO extends CI_Controller {
                                                         $admin_cell, $admin_designation, $admin_direct_line, $admin_email, $admin_name,
                                                         $billing_address, $billing_cell, $billing_designation, $billing_direct_line,
                                                         $billing_email, $billing_name, $tech_address, $tech_cell, $tech_designation, $tech_direct_line,
-                                                        $tech_email, $tech_name, $finance_description, $finance_end_point_address, $finance_install_charge,
-                                                        $finance_monthly_charge, $finance_start_point, $finance_subtotal, $finance_term, $finance_total,
+                                                        $tech_email, $tech_name, $finance_description, $end_point_address, $finance_install_charge,
+                                                        $finance_monthly_charge, $start_point, $finance_subtotal, $finance_term, $finance_total,
                                                         $finance_units, $finance_vat, $gps_coordinates, $vat_number, $special_terms, $registration_number,
-                                                        $installation_address, $bandwidth, $username, $user_id, $department_id));
+                                                        $installation_address, $bandwidth, $username, $user_id, $department_id, $suburb));
         }
         
     }
@@ -113,7 +121,9 @@ class SO extends CI_Controller {
         if ($current_stage == 1)
         {
             $notes = $_GET['next_stage_notes'];
-            echo json_encode($this->So_model->next_stage($current_stage, $next_stage, $notes, $so_id, $department_id, $user_id));
+            $stage_data = json_encode(array('notes' => $notes));
+            
+            echo json_encode($this->So_model->next_stage($current_stage, $next_stage, $so_id, $department_id, $user_id, $stage_data));
         }
         else if ($current_stage == 2)
         {
@@ -121,7 +131,40 @@ class SO extends CI_Controller {
             $checked_by = $_GET['txtCheckedBy'];
             $date_passed = $_GET['txtDatePassed'];
             
-            echo json_encode($this->So_model->next_stage($current_stage, $next_stage, $notes, $so_id, $department_id, $user_id, $checked_by, $date_passed));
+            $stage_data = json_encode(array('notes' => $notes, 
+                                            'checked_by' => $checked_by, 
+                                            'date_passed' => $date_passed));
+            
+            echo json_encode($this->So_model->next_stage($current_stage, $next_stage, $so_id, $department_id, $user_id, $stage_data));
+        }
+        else if ($current_stage == 3)
+        {
+        }
+        else if ($current_stage == 4)
+        {
+            $notes = $_GET['next_stage_notes'];
+            $allocated_by = $_GET['txtAllocatedBy'];
+            $date_allocated = $_GET['txtDateAllocated'];
+            $planning_engineer_name = $_GET['planning_engineer_name_dd'];
+            
+            $stage_data = json_encode(array('notes' => $notes, 
+                                            'allocated_by' => $allocated_by, 
+                                            'date_allocated' => $date_allocated, 
+                                            'planning_engineer_name' => $planning_engineer_name));
+            
+            echo json_encode($this->So_model->next_stage($current_stage, $next_stage, $so_id, $department_id, $user_id, $stage_data));
+        }
+        else if ($current_stage == 5)
+        {
+            $notes = $_GET['next_stage_notes'];
+            $date_of_survey = $_GET['txtDateOfSurvey'];
+            $stage_number = $_GET['stage_dd'];
+            
+            $stage_data = json_encode(array('notes' => $notes, 
+                                            'date_of_survey' => $date_of_survey, 
+                                            'stage_number' => $stage_number));
+            
+            echo json_encode($this->So_model->next_stage($current_stage, $next_stage, $so_id, $department_id, $user_id, $stage_data));
         }
         else if ($current_stage == 6)
         {
@@ -129,7 +172,10 @@ class SO extends CI_Controller {
             $date_of_boq_submission = $_GET['date_of_boq_submission'];
             $stage = $_GET['stage'];
             
-            echo json_encode($this->So_model->next_stage($current_stage, $next_stage, $notes, $so_id, $department_id, $user_id, $date_of_boq_submission, $stage));
+            $stage_data = json_encode(array('notes' => $notes, 
+                                            'date_of_boq_submission' => $date_of_boq_submission, 
+                                            'stage' => $stage));
+            echo json_encode($this->So_model->next_stage($current_stage, $next_stage, $so_id, $department_id, $user_id, $stage_data));
         }
     }
     
@@ -149,5 +195,13 @@ class SO extends CI_Controller {
     public function get_so_statuses()
     {
         echo json_encode($this->So_model->get_so_statuses());
+    }
+    
+    public function change_so_owner()
+    {
+        $so_id = $_GET['so_id'];
+        $user_id = $_GET['change_owner_dd'];
+        
+        echo json_encode($this->So_model->change_so_owner($so_id, $user_id));
     }
 }

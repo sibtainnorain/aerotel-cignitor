@@ -58,7 +58,8 @@
 
                 $.get("so/get_all_sos",
                 {'user_id': '<?php echo $this->session->userdata('user_id'); ?>',
-                 'department_id': '<?php echo $this->session->userdata('department_id'); ?>'
+                 'department_id': '<?php echo $this->session->userdata('department_id'); ?>',
+                 'stage_number': '<?php echo $this->session->userdata('stage_number'); ?>'
                 },
                 function(result) 
                 {
@@ -70,7 +71,7 @@
                         var records = obj.records;
                         var department_id = '<?php echo $this->session->userdata('department_id'); ?>';
                         var current_user = '<?php echo $this->session->userdata('user_id'); ?>';
-                        var user_is_supervisor = '<?php echo $this->session->userdata('is_supervisor'); ?>';
+                        var user_is_supervisor = '<?php echo filter_var($this->session->userdata('is_supervisor'), FILTER_VALIDATE_BOOLEAN); ?>';
                         
                         if (obj.count > 0)
                         {
@@ -84,7 +85,8 @@
                                 var next_stage_btn = $('<a style="text-decoration: none; padding: 0;" title="Advance to next stage" href="javascript:void(0);"><button data-toggle="modal" data-target="#next_stage_modal" class="btn btn-xs btn-success action_btn" value="' + records[i].id +'"><i class="icon-ok bigger-120"></i></button></a>');
                                 var change_owner_btn = $('<a style="text-decoration: none; padding: 0;" title="Change Owner" href="javascript:void(0);"><button data-toggle="modal" data-target="#change_owner_modal" class="btn btn-xs btn-success action_btn" value="' + records[i].id +'"><i class="icon-user bigger-120"></i></button></a>');
                                 
-                                $('<td><b>' + records[i].id + '</b></td>').css('cursor', 'pointer').addClass('so_list_td').appendTo(row);
+                                $('<td><b>' + records[i].so_header + '</b><input type="hidden" value="' + records[i].id + '" /></td>').css('cursor', 'pointer').addClass('so_list_td').appendTo(row);
+                                $('<td><b>' + records[i].current_stage_number + '</b></td>').css('cursor', 'pointer').addClass('so_list_td').appendTo(row);
                                 $('<td>' + records[i].order_type + '</td>').css('cursor', 'pointer').addClass('so_list_td').appendTo(row);
                                 $('<td>' + records[i].technology_type + '</td>').css('cursor', 'pointer').addClass('so_list_td').appendTo(row);
                                 $('<td>' + records[i].service_type + '</td>').css('cursor', 'pointer').addClass('so_list_td').appendTo(row);
@@ -179,12 +181,12 @@
                         $('#canceled_sos_count').html(c_count);
 
                         $('.action_btn').click(function(){
-                            selected_so = $(this).parent().parent().siblings()[0].children[0].innerHTML;
+                            selected_so = $(this).parent().parent().siblings()[0].children[1].value;
                         });
                     }
                     
                     $('.so_list_td').click(function(){
-                        window.location = 'so/so_details';
+                        window.location = 'so/so_history/' + $(this).siblings()[0].children[1].value;
                     });
                 });
 
@@ -201,7 +203,7 @@
 
                                     for (var i = 0; i < records.length; i++)
                                     {
-                                        $('<option value="' + records[i].country_id + '">' + records[i].country_name + '</option>').css('text-indent', '0px').appendTo($("#country_dd"));
+                                        $('<option value="' + records[i].country_name + '">' + records[i].country_name + '</option>').css('text-indent', '0px').appendTo($("#country_dd"));
                                     }
                                 }
                             });
@@ -215,7 +217,7 @@
 
                                     for (var i = 0; i < records.length; i++)
                                     {
-                                        $('<option value="' + records[i].st_id + '">' + records[i].st_name + '</option>').css('text-indent', '0px').appendTo($("#service_type_dd"));
+                                        $('<option value="' + records[i].st_name + '">' + records[i].st_name + '</option>').css('text-indent', '0px').appendTo($("#service_type_dd"));
                                     }
                                 }
                             });
@@ -229,7 +231,7 @@
 
                                     for (var i = 0; i < records.length; i++)
                                     {
-                                        $('<option value="' + records[i].ot_id + '">' + records[i].ot_name + '</option>').css('text-indent', '0px').appendTo($("#order_type_dd"));
+                                        $('<option value="' + records[i].ot_name + '">' + records[i].ot_name + '</option>').css('text-indent', '0px').appendTo($("#order_type_dd"));
                                     }
                                 }
                             });
@@ -243,7 +245,7 @@
 
                                     for (var i = 0; i < records.length; i++)
                                     {
-                                        $('<option value="' + records[i].tt_id + '">' + records[i].tt_name + '</option>').css('text-indent', '0px').appendTo($("#technology_type_dd"));
+                                        $('<option value="' + records[i].tt_name + '">' + records[i].tt_name + '</option>').css('text-indent', '0px').appendTo($("#technology_type_dd"));
                                     }
                                 }
                             });
@@ -257,7 +259,7 @@
 
                                     for (var i = 0; i < records.length; i++)
                                     {
-                                        $('<option value="' + records[i].isp_id + '">' + records[i].isp_name + '</option>').css('text-indent', '0px').appendTo($("#isp_dd"));
+                                        $('<option value="' + records[i].isp_name + '">' + records[i].isp_name + '</option>').css('text-indent', '0px').appendTo($("#isp_dd"));
                                     }
                                 }
                             });
@@ -271,7 +273,7 @@
 
                                     for (var i = 0; i < records.length; i++)
                                     {
-                                        $('<option value="' + records[i].suburb_code + '">' + records[i].suburb_name + '</option>').css('text-indent', '0px').appendTo($("#suburb_dd"));
+                                        $('<option value="' + records[i].suburb_name + '">' + records[i].suburb_name + '</option>').css('text-indent', '0px').appendTo($("#suburb_dd"));
                                     }
                                 }
                             });
@@ -393,12 +395,13 @@
                                                 <table class="table table-striped" id="normal_sos_table" style="display: none;">
                                                     <thead>
                                                         <tr class="header-columns">
-                                                            <th style="width: 10%">SO Number</th>
+                                                            <th style="width: 8%">SO Header</th>
+                                                            <th style="width: 8%">Current Stage</th>
                                                             <th style="width: 15%">Order Type</th>
                                                             <th style="width: 20%">Technology Type</th>
                                                             <th style="width: 10%">Service Type</th>
                                                             <th style="width: 15%">Customer Name</th>
-                                                            <th style="width: 15%">Location</th>
+                                                            <th style="width: 12%">Location</th>
                                                             <th style="width: 15%">Action Bar</th>
                                                         </tr>
                                                     </thead>
@@ -410,12 +413,13 @@
                                                 <table class="table table-striped" id="urgent_sos_table">
                                                     <thead>
                                                         <tr class="header-columns">
-                                                            <th style="width: 10%">SO Number</th>
+                                                            <th style="width: 8%">SO Header</th>
+                                                            <th style="width: 8%">Current Stage</th>
                                                             <th style="width: 15%">Order Date</th>
                                                             <th style="width: 20%">Technology Type</th>
                                                             <th style="width: 10%">Service Type</th>
                                                             <th style="width: 15%">Customer Name</th>
-                                                            <th style="width: 15%">Location</th>
+                                                            <th style="width: 12%">Location</th>
                                                             <th style="width: 15%">Action Bar</th>
                                                         </tr>
                                                     </thead>
@@ -427,12 +431,13 @@
                                                 <table class="table table-striped" id="stalled_sos_table">
                                                     <thead>
                                                         <tr class="header-columns">
-                                                            <th style="width: 10%">SO Number</th>
+                                                            <th style="width: 8%">SO Header</th>
+                                                            <th style="width: 8%">Current Stage</th>
                                                             <th style="width: 15%">Order Date</th>
                                                             <th style="width: 20%">Technology Type</th>
                                                             <th style="width: 10%">Service Type</th>
                                                             <th style="width: 15%">Customer Name</th>
-                                                            <th style="width: 15%">Location</th>
+                                                            <th style="width: 12%">Location</th>
                                                             <th style="width: 15%">Action Bar</th>
                                                         </tr>
                                                     </thead>
@@ -444,12 +449,13 @@
                                                 <table class="table table-striped" id="canceled_sos_table">
                                                     <thead>
                                                         <tr class="header-columns">
-                                                            <th style="width: 10%">SO Number</th>
+                                                            <th style="width: 8%">SO Header</th>
+                                                            <th style="width: 8%">Current Stage</th>
                                                             <th style="width: 15%">Order Date</th>
                                                             <th style="width: 20%">Technology Type</th>
                                                             <th style="width: 10%">Service Type</th>
                                                             <th style="width: 15%">Customer Name</th>
-                                                            <th style="width: 15%">Location</th>
+                                                            <th style="width: 12%">Location</th>
                                                             <th style="width: 15%">Action Bar</th>
                                                         </tr>
                                                     </thead>
@@ -527,6 +533,18 @@
                                     {
                                         include 'update_so_status_modal.php';
                                         include 'stage_2-3_modal.php';
+                                    }
+                                    else if ($this->session->userdata('department_id') == 3 && $this->session->userdata('stage_number') == 3) 
+                                    {
+                                        include 'stage_3-4_modal.php';
+                                    }
+                                    else if ($this->session->userdata('department_id') == 3 && $this->session->userdata('stage_number') == 4) 
+                                    {
+                                        include 'stage_4-5_modal.php';
+                                    }
+                                    else if ($this->session->userdata('department_id') == 3 && $this->session->userdata('stage_number') == 5) 
+                                    {
+                                        include 'stage_5-6_modal.php';
                                     }
                                 ?>
                             </div>

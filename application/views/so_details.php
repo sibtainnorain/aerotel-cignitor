@@ -62,11 +62,11 @@
                                         <tbody>
                                             <tr>
                                                 <th>LTZ Project Code</th>
-                                                <td>ZW-PTP-ZVI</td>
+                                                <td><?php echo $so_data['so_data']['so_header']; ?></td>
                                             </tr>
                                             <tr>
                                                 <th>Service Order Number</th>
-                                                <td>6012</td>
+                                                <td><?php echo $so_data['so_data']['id']; ?></td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -77,13 +77,13 @@
                                     <tbody>
                                         <tr>
                                             <td colspan="2"><h5><b>Customer Hereinafter the "Customer"</b></h5></td>
-                                            <td colspan="2"><h5><b>Unki Mine</b></h5></td>
+                                            <td colspan="2"><h5><b><?php echo $so_data['customer_data']['customer_name']; ?></b></h5></td>
                                         </tr>
                                         <tr>
                                             <td>VAT Number</td>
-                                            <td>123456</td>
+                                            <td><?php echo $so_history[0]->stage_data->vat_number; ?></td>
                                             <td>Registration Number / ID Number</th>
-                                            <td>2002/2876421</td>
+                                            <td><?php echo $so_history[0]->stage_data->registration_number; ?></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -96,63 +96,63 @@
                                         </tr>
                                         <tr>
                                             <td class="active">Name</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->admin_name; ?></td>
                                             <td class="active">Designation</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->admin_designation; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Direct Line</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->admin_direct_line; ?></td>
                                             <td class="active">Cell</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->admin_cell; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Address</td>
-                                            <td>17 KM off Zvishavane Rd, Zvishavane</td>
+                                            <td><?php echo $so_history[0]->stage_data->admin_address; ?></td>
                                             <td class="active">Email</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->admin_email; ?></td>
                                         </tr>
                                         <tr>
                                             <th colspan="4">Contact Details - Technical Contact</th>
                                         </tr>
                                         <tr>
                                             <td class="active">Name</td>
-                                            <td>Mphumi Sithole</td>
+                                            <td><?php echo $so_history[0]->stage_data->tech_name; ?></td>
                                             <td class="active">Designation</td>
-                                            <td>IT Manager</td>
+                                            <td><?php echo $so_history[0]->stage_data->tech_designation; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Direct Line</td>
-                                            <td>+26316232610</td>
+                                            <td><?php echo $so_history[0]->stage_data->tech_direct_line; ?></td>
                                             <td class="active">Cell</td>
-                                            <td>+263775281456</td>
+                                            <td><?php echo $so_history[0]->stage_data->tech_cell; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Address</td>
-                                            <td>Box 125, Zvishavane</td>
+                                            <td><?php echo $so_history[0]->stage_data->tech_address; ?></td>
                                             <td class="active">Email</td>
-                                            <td>mpumi@angloplatnum.com</td>
+                                            <td><?php echo $so_history[0]->stage_data->tech_email; ?></td>
                                         </tr>
                                         <tr>
                                             <th colspan="4">Contact Details - Billing Contact</th>
                                         </tr>
                                         <tr>
                                             <td class="active">Name</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->billing_name; ?></td>
                                             <td class="active">Designation</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->billing_designation; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Direct Line</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->billing_direct_line; ?></td>
                                             <td class="active">Cell</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->billing_cell; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Address</td>
-                                            <td>Box 125, Zvishavane</td>
+                                            <td><?php echo $so_history[0]->stage_data->billing_address; ?></td>
                                             <td class="active">Email</td>
-                                            <td></td>
+                                            <td><?php echo $so_history[0]->stage_data->billing_email; ?></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -165,37 +165,37 @@
                                         </tr>
                                         <tr>
                                             <td class="active">Country</td>
-                                            <td>Zimbabwe</td>
+                                            <td><?php echo $so_data['so_data']['country']; ?></td>
                                             <td class="active">Order Type</td>
-                                            <td>New Client Connection</td>
+                                            <td><?php echo $so_data['so_data']['order_type']; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Special Terms</td>
-                                            <td>Customer Pays Quarterly</td>
+                                            <td><?php echo $so_history[0]->stage_data->special_terms; ?></td>
                                             <td class="active">Service Type</td>
-                                            <td>MPLS-VPN</td>
+                                            <td><?php echo $so_data['so_data']['service_type']; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Town</td>
-                                            <td>Zvishavane</td>
+                                            <td><?php echo $so_history[0]->stage_data->suburb; ?></td>
                                             <td class="active">Technology Type</td>
-                                            <td>Fibre</td>
+                                            <td><?php echo $so_data['so_data']['technology_type']; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">GPS Coordinates</td>
-                                            <td>19°40'S 30°00'E / 19.667°S 30.000°E</td>
+                                            <td><?php echo $so_history[0]->stage_data->gps_coordinates; ?></td>
                                             <td class="active">Bandwidth</td>
-                                            <td>10 Meg</td>
+                                            <td><?php echo $so_history[0]->stage_data->bandwidth; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Start Point</td>
-                                            <td>Zvishavane</td>
+                                            <td><?php echo $so_history[0]->stage_data->start_point; ?></td>
                                             <td class="active">End Point Address</td>
-                                            <td>3 Sandton , Jorburg, South Africa</td>
+                                            <td><?php echo $so_history[0]->stage_data->end_point_address; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Installation Address</td>
-                                            <td colspan="3">17 KM off Zvishavane Rd, Zvishavane </td>
+                                            <td colspan="3"><?php echo $so_history[0]->stage_data->installation_address; ?></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Notes</td>
@@ -212,13 +212,13 @@
                                         </tr>
                                         <tr>
                                             <td class="active">Name</td>
-                                            <td>Hamilton Manika</td>
+                                            <td></td>
                                             <td class="active">Cell</td>
-                                            <td>+263774545812</td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Email</td>
-                                            <td colspan="3">hamiltom.manika@liquidtelecom.co.zw</td>
+                                            <td colspan="3"></td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -231,28 +231,28 @@
                                         </tr>
                                         <tr>
                                             <td class="active">Name</td>
-                                            <td>ZOL</td>
+                                            <td><?php echo $so_history[0]->stage_data->isp; ?></td>
                                             <td class="active">Address</td>
-                                            <td>3rd  Floor Green Bridge, Eastgate,Harare</td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Website</td>
-                                            <td>www.zol.co.zw</td>
+                                            <td></td>
                                             <td class="active">VAT Number</td>
-                                            <td>2514781252</td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <th colspan="4">Contact Person - Details</th>
                                         </tr>
                                         <tr>
                                             <td class="active">Name</td>
-                                            <td>Rufaro Pwiti</td>
+                                            <td></td>
                                             <td class="active">Cell</td>
-                                            <td>+263774545879</td>
+                                            <td></td>
                                         </tr>
                                         <tr>
                                             <td class="active">Email</td>
-                                            <td colspan="4">Rpwiti@zol.co.zw</td>
+                                            <td colspan="4"></td>
                                         </tr>
                                     </tbody>
                                 </table>

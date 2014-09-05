@@ -8,7 +8,7 @@ class SO_model extends CI_Model {
         $this->load->database();
     }
     
-    public function get_all_sos($user_id, $department_id)
+    public function get_all_sos($user_id, $department_id, $stage_number)
     {
         $so_data_row = array();
         $so_data_arr = array();
@@ -22,7 +22,7 @@ class SO_model extends CI_Model {
             {
                 if ($this->session->userdata('is_supervisor') == 'true')
                 {
-                    $query = $this->db->get_where('tbl_so', array('department_id' => $this->session->userdata('department_id')));
+                    $query = $this->db->get_where('tbl_so', array('department_id' => $department_id, 'current_stage_number' => $stage_number));
                 }
                 else
                 {
@@ -33,7 +33,12 @@ class SO_model extends CI_Model {
             if ($query->num_rows() > 0)
             {
                 $so_data = $query->result_array();
-
+                
+                for($i = 0; $i < count($so_data); $i++)
+                {
+                    $so_data[$i]['customer_name'] = $this->get_customer_name($so_data[$i]['customer_id']);
+                }
+                
                 return array(
                     'status' => 'SUCCESS',
                     'message' => 'Records Found.',
@@ -68,7 +73,13 @@ class SO_model extends CI_Model {
         
         $current_stage_number = $so_data['current_stage_number'];
         $current_stage_data = $this->get_stage_by_number($current_stage_number);
-        $next_stage_data = $this->get_stage_by_number($current_stage_number + 1);
+        $next_stage_data = null;
+        
+        if ($current_stage_number == 6)
+        {
+            $next_stage_data = $this->get_stage_by_number(7);
+        }
+        
         $customer_data = $this->get_customer_by_id($so_data['customer_id']);
         
         if (sizeof($so_data) > 0)
@@ -101,18 +112,17 @@ class SO_model extends CI_Model {
                               $admin_address, $admin_cell, $admin_designation, $admin_direct_line, $admin_email,
                               $admin_name, $billing_address, $billing_cell, $billing_designation, $billing_direct_line,
                               $billing_email, $billing_name, $tech_address, $tech_cell, $tech_designation, $tech_direct_line,
-                              $tech_email, $tech_name, $finance_description, $finance_end_point_address, $finance_install_charge,
-                              $finance_monthly_charge, $finance_start_point, $finance_subtotal, $finance_term, $finance_total,
+                              $tech_email, $tech_name, $finance_description, $end_point_address, $finance_install_charge,
+                              $finance_monthly_charge, $start_point, $finance_subtotal, $finance_term, $finance_total,
                               $finance_units, $finance_vat, $gps_coordinates, $vat_number, $special_terms, $registration_number,
-                              $installation_address, $bandwidth, $username, $user_id, $department_id)
+                              $installation_address, $bandwidth, $username, $user_id, $department_id, $suburb)
     {
         $so_insert = array('so_header' => $txtSoHeader, 'customer_id' => $customer, 'user_id' => $user_id, 
                            'department_id' => $department_id, 'status_id' => 1, 
-                           'current_stage_number' => 1, 'order_type' => $this->get_order_type_by_id($order_type), 
-                           'service_type' => $this->get_service_type_by_id($service_type), 
-                           'country' => $this->get_country_by_id($country), 
-                           'customer_name' => $this->get_customer_name($customer), 
-                           'technology_type' => $this->get_technology_type_by_id($technology_type));
+                           'current_stage_number' => 1, 'order_type' => $order_type, 
+                           'service_type' => $service_type, 
+                           'country' => $country, 
+                           'technology_type' => $technology_type);
 
         $this->db->insert('tbl_so', $so_insert);
         $so_id = $this->db->insert_id();
@@ -126,12 +136,13 @@ class SO_model extends CI_Model {
                                             'billing_name' => $billing_name, 'tech_address' => $tech_address, 'tech_cell' => $tech_cell, 
                                             'tech_designation' => $tech_designation, 'tech_direct_line' => $tech_direct_line, 'tech_email' => $tech_email, 
                                             'tech_name' => $tech_name, 'finance_description' => $finance_description, 
-                                            'finance_end_point_address' => $finance_end_point_address, 'finance_install_charge' => $finance_install_charge, 
-                                            'finance_monthly_charge' => $finance_monthly_charge, 'finance_start_point' => $finance_start_point, 
+                                            'end_point_address' => $end_point_address, 'finance_install_charge' => $finance_install_charge, 
+                                            'finance_monthly_charge' => $finance_monthly_charge, 'start_point' => $start_point, 
                                             'finance_subtotal' => $finance_subtotal, 'finance_term' => $finance_term, 'finance_total' => $finance_total, 
                                             'finance_units' => $finance_units, 'finance_vat' => $finance_vat, 'gps_coordinates' => $gps_coordinates, 
                                             'vat_number' => $vat_number, 'special_terms' => $special_terms, 'registration_number' => $registration_number, 
-                                            'installation_address' => $installation_address, 'bandwidth' => $bandwidth, 'gps_coordinates' => $gps_coordinates
+                                            'installation_address' => $installation_address, 'bandwidth' => $bandwidth, 'gps_coordinates' => $gps_coordinates,
+                                            'suburb' => $suburb, 'customer_name' => $this->get_customer_by_id($customer)
                     ));
         
         $stage_insert = array('so_id' => $so_id, 'user_id' => $user_id,
@@ -218,7 +229,7 @@ class SO_model extends CI_Model {
         return $this->db->get()->row()->department_id;
     }
     
-    public function next_stage($current_stage, $next_stage, $notes, $so_id, $department_id, $user_id, $checked_by=null, $date_passed=null, $date_of_boq_submission=null, $stage=null)
+    public function next_stage($current_stage, $next_stage, $so_id, $department_id, $user_id, $stage_data_json)
     {
         $data = array(
                     'current_stage_number' => $next_stage,
@@ -228,28 +239,6 @@ class SO_model extends CI_Model {
 
         $this->db->where('id', $so_id);
         $this->db->update('tbl_so', $data);
-        
-        if ($current_stage == 1)
-        {
-            $stage_data_json = json_encode(array('notes' => $notes));
-        }
-        else if ($current_stage == 2)
-        {
-            $stage_data_json = json_encode(array('notes' => $notes, 'checked_by' => $checked_by, 'date_passed' => $date_passed));
-        }
-        else if ($current_stage == 3)
-        {
-            $stage_data_json = json_encode(array('notes' => $notes, 'checked_by' => $checked_by, 'date_passed' => $date_passed));
-        }
-        else if ($current_stage == 4)
-        {
-            $stage_data_json = json_encode(array('notes' => $notes, 'checked_by' => $checked_by, 'date_passed' => $date_passed));
-        }
-        else if ($current_stage == 6)
-        {
-            $stage_data_json = json_encode(array('notes' => $notes, 'date_of_boq_submission' => $date_of_boq_submission, 'stage' => $stage));
-        }
-        
         
         $stage_insert = array('so_id' => $so_id, 'user_id' => $user_id,
                               'department_id' => $department_id, 'stage_number' => $current_stage, 
@@ -265,7 +254,6 @@ class SO_model extends CI_Model {
     
     public function get_so_statuses()
     {
-        //$this->db->from('tbl_so_status');
         $resultset = $this->db->get('tbl_so_status')->result();
         
         if (sizeof($resultset) > 0)
@@ -306,7 +294,7 @@ class SO_model extends CI_Model {
     public function get_stage_by_number($stage_number)
     {
         $this->db->from('tbl_stage');   
-        $this->db->where('stage_number', $stage_number);
+        $this->db->where(array('stage_number' => (string)$stage_number));
         return $this->db->get()->row_array();
     }
     
@@ -322,5 +310,39 @@ class SO_model extends CI_Model {
         $this->db->from('tbl_stage');   
         $this->db->where('stage_number', $stage_number);
         return $this->db->get()->row()->customer_name;
+    }
+    
+    public function change_so_owner($so_id, $user_id)
+    {
+        $data = array(
+                    'user_id' => $user_id
+                );
+
+        $this->db->where('id', $so_id);
+        $this->db->update('tbl_so', $data);
+        
+//        $this->db->where('so_id', $so_id);
+//        $this->db->update('tbl_stage_data', $data);
+        
+        return array(
+                'status' => 'SUCCESS',
+                'message' => 'SO owner has been changed successfully.'
+            );
+    }
+    
+    public function get_so_history($so_id)
+    {
+        $this->db->from('tbl_stage_data');
+        $this->db->where('so_id', $so_id);
+        $this->db->order_by('department_id', 'ASC');
+        
+        $resultset = $this->db->get()->result();
+        
+        for($i = 0; $i < count($resultset); $i++) 
+        {
+            $resultset[$i]->stage_data = json_decode($resultset[$i]->stage_data);
+        }
+        
+        return $resultset;
     }
 }
